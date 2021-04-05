@@ -1,4 +1,4 @@
-// Written by Jürgen Moßgraber - mossgrabers.de
+// Written by Lucian Hontau - lucianux.com
 // (c) 2017-2021
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
@@ -45,20 +45,7 @@ public class MixView extends AbstractView<BeatstepControlSurface, BeatstepConfig
     @Override
     public void onKnob (final int index, final int value, final boolean isTurnedRight)
     {
-        final int adjustedIndex;
-        final ITrackBank tb = this.model.getTrackBank ();
-        final int track = this.model.getCurrentTrackBank ().getScrollPosition ();
-        final int bankOf16 = (int) Math.floor((track + 1) / 16) * 16;
-
-        if (index >= 0 && index <= 7) {
-            tb.scrollTo(0 + bankOf16, false);
-            adjustedIndex = index;
-        } else {
-            tb.scrollTo(8 + bankOf16, false);
-            adjustedIndex = index - 8;
-        }
-
-        final ITrack selectedTrack = tb.getItem(adjustedIndex);
+        ITrack selectedTrack = this.getTrackFromBank (index);
         if (selectedTrack != null)
             selectedTrack.changeVolume(value);
     }
@@ -68,6 +55,13 @@ public class MixView extends AbstractView<BeatstepControlSurface, BeatstepConfig
     @Override
     public void onGridNote (final int note, final int velocity)
     {
+        if (velocity == 0)
+            return;
+
+        final int track = this.getTrackFromPad (note);
+        ITrack selectedTrack = this.getTrackFromBank (track);
+        if (selectedTrack != null)
+            selectedTrack.toggleMute();
     }
 
 
@@ -86,5 +80,50 @@ public class MixView extends AbstractView<BeatstepControlSurface, BeatstepConfig
         padGrid.light (42, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
         padGrid.light (43, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
         padGrid.light (44, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
+    }
+
+    /**
+     * Get the track to change based on the knob index and the currently selected bank
+     *
+     * TODO: Save last position and restore after callin scrollTo()
+     *
+     * @param index
+     * @return
+     */
+    protected ITrack getTrackFromBank (final int index)
+    {
+        final int adjustedIndex;
+        final ITrackBank tb = this.model.getTrackBank ();
+        final int track = this.model.getCurrentTrackBank ().getScrollPosition ();
+        final int bankOf16 = (int) Math.floor((track + 1) / 16) * 16;
+
+        if (index >= 0 && index <= 7) {
+            tb.scrollTo(0 + bankOf16, false);
+            adjustedIndex = index;
+        } else {
+            tb.scrollTo(8 + bankOf16, false);
+            adjustedIndex = index - 8;
+        }
+
+        final ITrack selectedTrack = tb.getItem(adjustedIndex);
+
+        return selectedTrack;
+    }
+
+    /**
+     * Given a pad node, get the track number it corresponds to (0 - 15)
+     *
+     * @param note
+     */
+    protected int getTrackFromPad (final int note)
+    {
+        // Upper row: 44 - 51
+        // Lower row: 36 - 43
+        int track = note - 44;
+        if (track < 0) {
+            track += 16;
+        }
+
+        return track;
     }
 }
