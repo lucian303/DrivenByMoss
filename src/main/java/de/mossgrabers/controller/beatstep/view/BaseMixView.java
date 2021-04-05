@@ -33,29 +33,41 @@ public abstract class BaseMixView extends AbstractView<BeatstepControlSurface, B
     /**
      * Get the track to change based on the knob index and the currently selected bank
      *
-     * TODO: Save last position and restore after callin scrollTo()
+     * TODO: Save last position and restore after calling scrollTo()
      *
      * @param index
      * @return
      */
     protected ITrack getTrackFromBank (final int index)
     {
-        final int adjustedIndex;
-        final ITrackBank tb = this.model.getTrackBank ();
-        final int track = this.model.getCurrentTrackBank ().getScrollPosition ();
-        final int bankOf16 = (int) Math.floor((track + 1) / 16) * 16;
+        try {
+            final int adjustedIndex;
+            final int offset;
 
-        if (index >= 0 && index <= 7) {
-            tb.scrollTo(0 + bankOf16, false);
-            adjustedIndex = index;
-        } else {
-            tb.scrollTo(8 + bankOf16, false);
-            adjustedIndex = index - 8;
+            final ITrackBank tb = this.model.getTrackBank ();
+            final int track = this.model.getCurrentTrackBank ().getScrollPosition ();
+            final int bankOf16 = (int) Math.floor((track + 1) / 16) * 16;
+
+            if (index >= 0 && index <= 7) {
+                offset = 0;
+                adjustedIndex = index;
+            } else {
+                offset = 8;
+                adjustedIndex = index - 8;
+            }
+
+            final int position = offset + bankOf16;
+            if (position < 0 || position > tb.getItemCount()) {
+                return null;
+            }
+
+            tb.scrollTo(position, false);
+            final ITrack selectedTrack = tb.getItem(adjustedIndex);
+
+            return selectedTrack;
+        } catch (Throwable t) {
+            return null;
         }
-
-        final ITrack selectedTrack = tb.getItem(adjustedIndex);
-
-        return selectedTrack;
     }
 
     /**
@@ -63,7 +75,7 @@ public abstract class BaseMixView extends AbstractView<BeatstepControlSurface, B
      *
      * @param note
      */
-    protected int getTrackFromPad (final int note)
+    protected int getTrackFromPadNote(final int note)
     {
         // Upper row: 44 - 51
         // Lower row: 36 - 43

@@ -48,7 +48,7 @@ public class MixView extends BaseMixView implements BeatstepView {
         if (velocity == 0)
             return;
 
-        final int track = this.getTrackFromPad(note);
+        final int track = this.getTrackFromPadNote(note);
         ITrack selectedTrack = this.getTrackFromBank(track);
         if (selectedTrack != null)
             selectedTrack.toggleMute();
@@ -60,16 +60,11 @@ public class MixView extends BaseMixView implements BeatstepView {
      */
     @Override
     public void drawGrid() {
-        final ITrackBank tb = this.model.getCurrentTrackBank();
         final IPadGrid padGrid = this.surface.getPadGrid();
-        padGrid.light(36, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
-        padGrid.light(37, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
-        padGrid.light(38, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
-        padGrid.light(39, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
-        padGrid.light(40, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
-        padGrid.light(41, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
-        padGrid.light(42, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
-        padGrid.light(43, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
-        padGrid.light(44, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
+
+        for (int i = 36; i <= 51; i++) {
+            // Disable as trying to show the correct light doesn't work
+            padGrid.light(i, BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF);
+        }
     }
 }
