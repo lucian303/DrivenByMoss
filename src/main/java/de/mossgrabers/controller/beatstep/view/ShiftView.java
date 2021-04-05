@@ -33,7 +33,8 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
         Views.PLAY,
         Views.DRUM,
         Views.SEQUENCER,
-        Views.SESSION
+        Views.SESSION,
+        Views.MIX
     };
 
     private PlayCommand<BeatstepControlSurface, BeatstepConfiguration> playCommand;
@@ -136,7 +137,7 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
 
             default:
                 viewIndex = note - 44;
-                if (viewIndex < 0 || viewIndex >= 6)
+                if (viewIndex < 0 || viewIndex >= 7)
                     return;
 
                 final ViewManager viewManager = this.surface.getViewManager ();

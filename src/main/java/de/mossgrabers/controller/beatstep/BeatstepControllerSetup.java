@@ -16,6 +16,7 @@ import de.mossgrabers.controller.beatstep.view.SequencerView;
 import de.mossgrabers.controller.beatstep.view.SessionView;
 import de.mossgrabers.controller.beatstep.view.ShiftView;
 import de.mossgrabers.controller.beatstep.view.TrackView;
+import de.mossgrabers.controller.beatstep.view.MixView;
 import de.mossgrabers.framework.command.aftertouch.AftertouchAbstractViewCommand;
 import de.mossgrabers.framework.command.continuous.PlayPositionCommand;
 import de.mossgrabers.framework.configuration.ISettingsUI;
@@ -146,6 +147,8 @@ public class BeatstepControllerSetup extends AbstractControllerSetup<BeatstepCon
 
         viewManager.register (Views.BROWSER, new BrowserView (surface, this.model));
         viewManager.register (Views.SHIFT, new ShiftView (surface, this.model));
+
+        viewManager.register (Views.MIX, new MixView (surface, this.model));
     }
 
 
