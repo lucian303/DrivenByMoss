@@ -107,8 +107,13 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
 
             // Enter layer
             case 3:
-                if (!cd.hasLayers ())
+                // If no layer, show/hide the remote control param page
+                if (!cd.hasLayers ()) {
+                    cd.toggleParameterPageSectionVisible ();
+
                     return;
+                }
+
                 if (this.isLayer)
                 {
                     if (sel.isPresent ())
