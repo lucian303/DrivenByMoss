@@ -9,6 +9,7 @@ import de.mossgrabers.controller.beatstep.controller.BeatstepColorManager;
 import de.mossgrabers.controller.beatstep.controller.BeatstepControlSurface;
 import de.mossgrabers.framework.command.trigger.transport.PlayCommand;
 import de.mossgrabers.framework.controller.grid.IPadGrid;
+import de.mossgrabers.framework.daw.IApplication;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.ITransport;
 import de.mossgrabers.framework.daw.data.ICursorDevice;
@@ -126,12 +127,13 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
                 this.model.getBrowser ().insertAfterCursorDevice ();
                 break;
 
-            // Open the browser
+            // Switch layouts
             case 7:
-                if (this.model.hasSelectedDevice ())
-                    this.model.getBrowser ().replace (cursorDevice);
+                IApplication app = this.model.getApplication ();
+                if (!app.isMixerLayout ())
+                    app.setPanelLayout ("MIX");
                 else
-                    this.model.getBrowser ().insertAfterCursorDevice ();
+                    app.setPanelLayout ("ARRANGE");
                 break;
 
             default:
