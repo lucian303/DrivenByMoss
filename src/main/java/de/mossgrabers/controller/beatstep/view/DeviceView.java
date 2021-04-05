@@ -139,7 +139,7 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
                 break;
 
             case 5:
-                // Intentionally empty
+                this.model.getBrowser ().replace (cd);
                 break;
 
             // Param bank down
@@ -174,7 +174,7 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
         padGrid.light (38, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
         padGrid.light (39, BeatstepColorManager.BEATSTEP_BUTTON_STATE_RED);
         padGrid.light (40, BeatstepColorManager.BEATSTEP_BUTTON_STATE_RED);
-        padGrid.light (41, BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF);
+        padGrid.light (41, BeatstepColorManager.BEATSTEP_BUTTON_STATE_PINK);
         padGrid.light (42, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
         padGrid.light (43, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
     }
