@@ -66,9 +66,6 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
         if (velocity == 0)
             return;
 
-        if (!this.model.hasSelectedDevice ())
-            return;
-
         final ICursorDevice cd = this.model.getCursorDevice ();
         final IChannelBank<ILayer> bank = cd.getLayerBank ();
         final Optional<ILayer> sel = bank.getSelectedItem ();
@@ -139,8 +136,12 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
 
                 break;
 
+            // Open browser / create device
             case 5:
-                this.model.getBrowser ().replace (cd);
+                if (this.model.hasSelectedDevice ())
+                    this.model.getBrowser ().replace (cd);
+                else
+                    this.model.getBrowser ().insertAfterCursorDevice ();
                 break;
 
             // Param bank down
