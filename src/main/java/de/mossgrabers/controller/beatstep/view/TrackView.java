@@ -12,6 +12,7 @@ import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.daw.data.bank.ITrackBank;
 import de.mossgrabers.framework.featuregroup.AbstractView;
+import de.mossgrabers.framework.view.Views;
 
 import java.util.Optional;
 
@@ -61,15 +62,6 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
             case 13:
                 if (!this.model.isEffectTrackBankActive ())
                     selectedTrack.get ().getSendBank ().getItem (index - 8).changeValue (value);
-                break;
-
-            case 14:
-                // Not used
-                break;
-
-            // Crossfader
-            case 15:
-                this.model.getTransport ().changeCrossfade (value);
                 break;
 
             default:
@@ -129,8 +121,9 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
                 tb.selectParent ();
                 break;
 
-            // Unused
+            // Switch to device mode
             case 5:
+                this.surface.getViewManager ().setActive (Views.DEVICE);
                 break;
 
             // Track Page down
@@ -166,7 +159,7 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
         padGrid.light (38, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
         padGrid.light (39, BeatstepColorManager.BEATSTEP_BUTTON_STATE_RED);
         padGrid.light (40, BeatstepColorManager.BEATSTEP_BUTTON_STATE_RED);
-        padGrid.light (41, BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF);
+        padGrid.light (41, BeatstepColorManager.BEATSTEP_BUTTON_STATE_PINK);
         padGrid.light (42, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
         padGrid.light (43, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
     }
