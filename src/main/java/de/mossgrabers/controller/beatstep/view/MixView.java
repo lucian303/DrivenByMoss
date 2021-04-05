@@ -47,12 +47,14 @@ public class MixView extends AbstractView<BeatstepControlSurface, BeatstepConfig
     {
         final int adjustedIndex;
         final ITrackBank tb = this.model.getTrackBank ();
+        final int track = this.model.getCurrentTrackBank ().getScrollPosition ();
+        final int bankOf16 = (int) Math.floor((track + 1) / 16) * 16;
 
         if (index >= 0 && index <= 7) {
-            tb.scrollTo(0, false);
+            tb.scrollTo(0 + bankOf16, false);
             adjustedIndex = index;
         } else {
-            tb.scrollTo(8, false);
+            tb.scrollTo(8 + bankOf16, false);
             adjustedIndex = index - 8;
         }
 
