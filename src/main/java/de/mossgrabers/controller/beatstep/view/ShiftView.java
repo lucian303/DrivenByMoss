@@ -34,7 +34,8 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
         Views.DRUM,
         Views.SEQUENCER,
         Views.SESSION,
-        Views.MIX
+        Views.MIX,
+        Views.TRACK_PAN
     };
 
     private PlayCommand<BeatstepControlSurface, BeatstepConfiguration> playCommand;
@@ -110,9 +111,9 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
                 this.model.getTransport ().toggleMetronome ();
                 break;
 
-            // Tap Tempo
+            // Toggle window of VSTs
             case 4:
-                this.model.getTransport ().tapTempo ();
+                cursorDevice.toggleWindowOpen ();
                 break;
 
             // Insert device before current
@@ -130,14 +131,9 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
                 this.model.getBrowser ().replace (cursorDevice);
                 break;
 
-            // Toggle window of VSTs
-            case 15:
-                cursorDevice.toggleWindowOpen ();
-                break;
-
             default:
                 viewIndex = note - 44;
-                if (viewIndex < 0 || viewIndex >= 7)
+                if (viewIndex < 0 || viewIndex >= 8)
                     return;
 
                 final ViewManager viewManager = this.surface.getViewManager ();

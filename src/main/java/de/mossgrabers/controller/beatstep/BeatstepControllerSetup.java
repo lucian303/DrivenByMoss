@@ -8,15 +8,7 @@ import de.mossgrabers.controller.beatstep.command.continuous.KnobRowViewCommand;
 import de.mossgrabers.controller.beatstep.controller.BeatstepColorManager;
 import de.mossgrabers.controller.beatstep.controller.BeatstepControlSurface;
 import de.mossgrabers.controller.beatstep.controller.BeatstepPadGrid;
-import de.mossgrabers.controller.beatstep.view.BrowserView;
-import de.mossgrabers.controller.beatstep.view.DeviceView;
-import de.mossgrabers.controller.beatstep.view.DrumView;
-import de.mossgrabers.controller.beatstep.view.PlayView;
-import de.mossgrabers.controller.beatstep.view.SequencerView;
-import de.mossgrabers.controller.beatstep.view.SessionView;
-import de.mossgrabers.controller.beatstep.view.ShiftView;
-import de.mossgrabers.controller.beatstep.view.TrackView;
-import de.mossgrabers.controller.beatstep.view.MixView;
+import de.mossgrabers.controller.beatstep.view.*;
 import de.mossgrabers.framework.command.aftertouch.AftertouchAbstractViewCommand;
 import de.mossgrabers.framework.command.continuous.PlayPositionCommand;
 import de.mossgrabers.framework.configuration.ISettingsUI;
@@ -149,6 +141,7 @@ public class BeatstepControllerSetup extends AbstractControllerSetup<BeatstepCon
         viewManager.register (Views.SHIFT, new ShiftView (surface, this.model));
 
         viewManager.register (Views.MIX, new MixView (surface, this.model));
+        viewManager.register (Views.TRACK_PAN, new PanView (surface, this.model));
     }
 
 
