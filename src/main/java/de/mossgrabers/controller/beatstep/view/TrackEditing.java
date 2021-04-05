@@ -6,8 +6,10 @@ package de.mossgrabers.controller.beatstep.view;
 
 import de.mossgrabers.controller.beatstep.controller.BeatstepControlSurface;
 import de.mossgrabers.framework.daw.IModel;
+import de.mossgrabers.framework.daw.data.ICursorDevice;
 import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.daw.data.bank.ITrackBank;
+import de.mossgrabers.framework.view.Views;
 
 import java.util.Optional;
 
@@ -68,7 +70,7 @@ public class TrackEditing
                 break;
 
             case 4:
-                selectedTrack.get ().getCrossfadeParameter ().changeValue (value);
+                selectedTrack.get ().setRecArm (isTurnedRight);
                 break;
 
             case 5:
@@ -80,7 +82,10 @@ public class TrackEditing
                 break;
 
             case 7:
-                this.model.getMasterTrack ().changeVolume (value);
+                this.surface.getViewManager ().setActive (Views.DEVICE);
+                final ICursorDevice cd = this.model.getCursorDevice ();
+                if (cd != null)
+                    this.model.getBrowser ().replace (cd);
                 break;
 
             // Send 1 - 4
