@@ -127,6 +127,9 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
 
             // Exit layer
             case 4:
+                // Toggle external VST window if not in layer
+                cd.toggleWindowOpen ();
+
                 if (this.isLayer)
                     this.isLayer = false;
                 else
