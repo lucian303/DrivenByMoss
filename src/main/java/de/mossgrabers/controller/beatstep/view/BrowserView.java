@@ -10,6 +10,7 @@ import de.mossgrabers.controller.beatstep.controller.BeatstepControlSurface;
 import de.mossgrabers.framework.controller.grid.IPadGrid;
 import de.mossgrabers.framework.daw.IBrowser;
 import de.mossgrabers.framework.daw.IModel;
+import de.mossgrabers.framework.daw.data.ICursorDevice;
 import de.mossgrabers.framework.featuregroup.AbstractView;
 
 
@@ -42,17 +43,20 @@ public class BrowserView extends AbstractView<BeatstepControlSurface, BeatstepCo
 
         final int steps = Math.abs (this.model.getValueChanger ().calcSteppedKnobChange (value));
 
+        // The "All Devices" column in BW is #7 but shows up as the 4th onscreen
+        final int[] cols = {0, 1, 7, 3, 4, 5, 6};
+
         int column;
         switch (index)
         {
-            case 8:
-            case 9:
-            case 10:
-            case 11:
-            case 12:
-            case 13:
-            case 14:
-                column = index - 8;
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+                column = cols[index];
                 if (isTurnedRight)
                 {
                     for (int i = 0; i < steps; i++)
@@ -65,7 +69,7 @@ public class BrowserView extends AbstractView<BeatstepControlSurface, BeatstepCo
                 }
                 break;
 
-            case 15:
+            case 7:
                 if (isTurnedRight)
                 {
                     for (int i = 0; i < steps; i++)
@@ -76,6 +80,18 @@ public class BrowserView extends AbstractView<BeatstepControlSurface, BeatstepCo
                     for (int i = 0; i < steps; i++)
                         browser.selectPreviousResult ();
                 }
+                break;
+
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+                final ICursorDevice cd = this.model.getCursorDevice ();
+                cd.getParameterBank ().getItem (index - 8).changeValue (value);
                 break;
 
             default:
@@ -112,29 +128,25 @@ public class BrowserView extends AbstractView<BeatstepControlSurface, BeatstepCo
                 break;
 
             // Notes for preview
+            case 1:
+                if (velocity == 0)
+                    return;
+                browser.previousContentType();
+                break;
             case 2:
-                this.surface.sendMidiEvent (0x90, 12, velocity);
-                break;
-            case 3:
-                this.surface.sendMidiEvent (0x90, 24, velocity);
-                break;
-            case 4:
-                this.surface.sendMidiEvent (0x90, 36, velocity);
+                if (velocity == 0)
+                    return;
+                browser.nextContentType();
                 break;
             case 5:
-                this.surface.sendMidiEvent (0x90, 48, velocity);
+                if (velocity == 0)
+                    return;
+                browser.selectPreviousResult();
                 break;
-            case 10:
-                this.surface.sendMidiEvent (0x90, 60, velocity);
-                break;
-            case 11:
-                this.surface.sendMidiEvent (0x90, 72, velocity);
-                break;
-            case 12:
-                this.surface.sendMidiEvent (0x90, 84, velocity);
-                break;
-            case 13:
-                this.surface.sendMidiEvent (0x90, 96, velocity);
+            case 6:
+                if (velocity == 0)
+                    return;
+                browser.selectNextResult();
                 break;
 
             // Not used
