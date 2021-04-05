@@ -93,7 +93,7 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
         {
             // Play
             case 0:
-                this.playCommand.executeNormal (ButtonEvent.DOWN);
+                this.playCommand.executeNormal (ButtonEvent.UP);
                 break;
 
             // Record
@@ -128,7 +128,10 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
 
             // Open the browser
             case 7:
-                this.model.getBrowser ().replace (cursorDevice);
+                if (this.model.hasSelectedDevice ())
+                    this.model.getBrowser ().replace (cursorDevice);
+                else
+                    this.model.getBrowser ().insertAfterCursorDevice ();
                 break;
 
             default:

@@ -84,8 +84,10 @@ public class TrackEditing
             case 7:
                 this.surface.getViewManager ().setActive (Views.DEVICE);
                 final ICursorDevice cd = this.model.getCursorDevice ();
-                if (cd != null)
+                if (this.model.hasSelectedDevice ())
                     this.model.getBrowser ().replace (cd);
+                else
+                    this.model.getBrowser ().insertAfterCursorDevice ();
                 break;
 
             // Send 1 - 4

@@ -11,6 +11,7 @@ import de.mossgrabers.framework.controller.grid.IPadGrid;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.daw.data.bank.ITrackBank;
+import de.mossgrabers.framework.daw.resource.ChannelType;
 import de.mossgrabers.framework.featuregroup.AbstractView;
 import de.mossgrabers.framework.view.Views;
 
@@ -85,11 +86,10 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
         int index;
         switch (note - 36)
         {
-            // Toggle Activate
+            // Toggle Solo
             case 0:
-
                 if (selectedTrack.isPresent ())
-                    selectedTrack.get ().toggleIsActivated ();
+                    selectedTrack.get ().toggleSolo ();
                 break;
 
             // Track left
