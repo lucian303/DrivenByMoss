@@ -14,6 +14,7 @@ import de.mossgrabers.framework.daw.data.ILayer;
 import de.mossgrabers.framework.daw.data.bank.IChannelBank;
 import de.mossgrabers.framework.daw.data.bank.IParameterPageBank;
 import de.mossgrabers.framework.featuregroup.AbstractView;
+import de.mossgrabers.framework.view.Views;
 
 import java.util.Optional;
 
@@ -74,9 +75,9 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
 
         switch (note - 36)
         {
-            // Toggle device on/off
+            // Back to track view
             case 0:
-                cd.toggleEnabledState ();
+                this.surface.getViewManager ().setActive (Views.TRACK);
                 break;
 
             // Device Left
