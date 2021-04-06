@@ -120,11 +120,13 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
             // Insert device before current
             case 5:
                 this.model.getBrowser ().insertBeforeCursorDevice ();
+                this.surface.getViewManager ().setActive (Views.DEVICE);
                 break;
 
             // Insert device after current
             case 6:
                 this.model.getBrowser ().insertAfterCursorDevice ();
+                this.surface.getViewManager ().setActive (Views.DEVICE);
                 break;
 
             // Switch layouts
