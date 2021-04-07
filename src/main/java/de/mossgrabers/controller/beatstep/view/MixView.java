@@ -32,9 +32,17 @@ public class MixView extends BaseMixView implements BeatstepView {
      */
     @Override
     public void onKnob(final int index, final int value, final boolean isTurnedRight) {
-        final ITrack selectedTrack = this.getTrackFromBank(index);
-        if (selectedTrack != null)
-            selectedTrack.changeVolume(value);
+        final ITrack selectedTrack = this.getTrackFromBank (index);
+        if (selectedTrack != null) {
+            int vol = selectedTrack.getVolume ();
+            if (isTurnedRight) {
+                vol += 1;
+            } else {
+                vol -= 1;
+            }
+
+            selectedTrack.setVolume (vol);
+        }
     }
 
 
@@ -46,8 +54,8 @@ public class MixView extends BaseMixView implements BeatstepView {
         if (velocity == 0)
             return;
 
-        final int track = this.getTrackFromPadNote(note);
-        final ITrack selectedTrack = this.getTrackFromBank(track);
+        final int track = this.getTrackFromPadNote (note);
+        final ITrack selectedTrack = this.getTrackFromBank (track);
         if (selectedTrack != null)
             selectedTrack.toggleMute();
     }

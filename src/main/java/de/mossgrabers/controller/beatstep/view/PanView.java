@@ -33,8 +33,16 @@ public class PanView extends BaseMixView implements BeatstepView {
     @Override
     public void onKnob(final int index, final int value, final boolean isTurnedRight) {
         final ITrack selectedTrack = this.getTrackFromBank(index);
-        if (selectedTrack != null)
-            selectedTrack.changePan(value);
+        if (selectedTrack != null) {
+            int pan = selectedTrack.getPan ();
+            if (isTurnedRight) {
+                pan += 1;
+            } else {
+                pan -= 1;
+            }
+
+            selectedTrack.setPan (pan);
+        }
     }
 
 
