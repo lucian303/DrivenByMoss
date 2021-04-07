@@ -23,16 +23,16 @@ public class PanView extends BaseMixView implements BeatstepView {
      * @param surface The controller
      * @param model   The model
      */
-    public PanView(final BeatstepControlSurface surface, final IModel model) {
-        super("Pan", surface, model);
+    public PanView (final BeatstepControlSurface surface, final IModel model) {
+        super ("Pan", surface, model);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onKnob(final int index, final int value, final boolean isTurnedRight) {
-        final ITrack selectedTrack = this.getTrackFromBank(index);
+    public void onKnob (final int index, final int value, final boolean isTurnedRight) {
+        final ITrack selectedTrack = this.getTrackFromBank (index);
         if (selectedTrack != null) {
             int pan = selectedTrack.getPan ();
             if (isTurnedRight) {
@@ -50,14 +50,14 @@ public class PanView extends BaseMixView implements BeatstepView {
      * {@inheritDoc}
      */
     @Override
-    public void onGridNote(final int note, final int velocity) {
+    public void onGridNote (final int note, final int velocity) {
         if (velocity == 0)
             return;
 
-        final int track = this.getTrackFromPadNote(note);
-        final ITrack selectedTrack = this.getTrackFromBank(track);
+        final int track = this.getTrackFromPadNote (note);
+        final ITrack selectedTrack = this.getTrackFromBank (track);
         if (selectedTrack != null)
-            selectedTrack.toggleSolo();
+            selectedTrack.toggleSolo ();
     }
 
 
@@ -65,12 +65,12 @@ public class PanView extends BaseMixView implements BeatstepView {
      * {@inheritDoc}
      */
     @Override
-    public void drawGrid() {
-        final IPadGrid padGrid = this.surface.getPadGrid();
+    public void drawGrid () {
+        final IPadGrid padGrid = this.surface.getPadGrid ();
 
         for (int i = 36; i <= 51; i++) {
             // Disable as trying to show the correct light doesn't work
-            padGrid.light(i, BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF);
+            padGrid.light (i, BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF);
         }
     }
 }

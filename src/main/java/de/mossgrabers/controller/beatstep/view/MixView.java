@@ -23,15 +23,15 @@ public class MixView extends BaseMixView implements BeatstepView {
      * @param surface The controller
      * @param model   The model
      */
-    public MixView(final BeatstepControlSurface surface, final IModel model) {
-        super("Mix", surface, model);
+    public MixView (final BeatstepControlSurface surface, final IModel model) {
+        super ("Mix", surface, model);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onKnob(final int index, final int value, final boolean isTurnedRight) {
+    public void onKnob (final int index, final int value, final boolean isTurnedRight) {
         final ITrack selectedTrack = this.getTrackFromBank (index);
         if (selectedTrack != null) {
             int vol = selectedTrack.getVolume ();
@@ -50,14 +50,14 @@ public class MixView extends BaseMixView implements BeatstepView {
      * {@inheritDoc}
      */
     @Override
-    public void onGridNote(final int note, final int velocity) {
+    public void onGridNote (final int note, final int velocity) {
         if (velocity == 0)
             return;
 
         final int track = this.getTrackFromPadNote (note);
         final ITrack selectedTrack = this.getTrackFromBank (track);
         if (selectedTrack != null)
-            selectedTrack.toggleMute();
+            selectedTrack.toggleMute ();
     }
 
 
@@ -65,12 +65,12 @@ public class MixView extends BaseMixView implements BeatstepView {
      * {@inheritDoc}
      */
     @Override
-    public void drawGrid() {
-        final IPadGrid padGrid = this.surface.getPadGrid();
+    public void drawGrid () {
+        final IPadGrid padGrid = this.surface.getPadGrid ();
 
         for (int i = 36; i <= 51; i++) {
             // Disable as trying to show the correct light doesn't work
-            padGrid.light(i, BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF);
+            padGrid.light (i, BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF);
         }
     }
 }
