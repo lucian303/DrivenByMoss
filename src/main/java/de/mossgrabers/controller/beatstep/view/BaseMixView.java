@@ -35,8 +35,8 @@ public abstract class BaseMixView extends AbstractView<BeatstepControlSurface, B
      *
      * TODO: Save last position and restore after calling scrollTo()
      *
-     * @param index
-     * @return
+     * @param index Knob index
+     * @return Track or null
      */
     protected ITrack getTrackFromBank (final int index)
     {
@@ -46,7 +46,7 @@ public abstract class BaseMixView extends AbstractView<BeatstepControlSurface, B
 
             final ITrackBank tb = this.model.getTrackBank ();
             final int track = this.model.getCurrentTrackBank ().getScrollPosition ();
-            final int bankOf16 = (int) Math.floor((track + 1) / 16) * 16;
+            final int bankOf16 = (int) Math.floor((float) (track + 1) / 16) * 16;
 
             if (index >= 0 && index <= 7) {
                 offset = 0;
@@ -62,9 +62,8 @@ public abstract class BaseMixView extends AbstractView<BeatstepControlSurface, B
             }
 
             tb.scrollTo(position, false);
-            final ITrack selectedTrack = tb.getItem(adjustedIndex);
 
-            return selectedTrack;
+            return tb.getItem(adjustedIndex);
         } catch (Throwable t) {
             return null;
         }
@@ -73,7 +72,7 @@ public abstract class BaseMixView extends AbstractView<BeatstepControlSurface, B
     /**
      * Given a pad node, get the track number it corresponds to (0 - 15)
      *
-     * @param note
+     * @param note Pad note played
      */
     protected int getTrackFromPadNote(final int note)
     {

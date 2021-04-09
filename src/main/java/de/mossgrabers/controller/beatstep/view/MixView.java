@@ -41,6 +41,7 @@ public class MixView extends BaseMixView implements BeatstepView {
                 vol -= 1;
             }
 
+            this.surface.getDisplay ().notify ("Volume " + (selectedTrack.getPosition () + 1) + (isTurnedRight ? " up" : " down"));
             selectedTrack.setVolume (vol);
         }
     }
@@ -56,8 +57,11 @@ public class MixView extends BaseMixView implements BeatstepView {
 
         final int track = this.getTrackFromPadNote (note);
         final ITrack selectedTrack = this.getTrackFromBank (track);
-        if (selectedTrack != null)
+        if (selectedTrack != null) {
+            this.surface.getDisplay ().notify ("Mute " + (selectedTrack.getPosition () + 1));
+
             selectedTrack.toggleMute ();
+        }
     }
 
 

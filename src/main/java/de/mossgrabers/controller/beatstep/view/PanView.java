@@ -41,6 +41,7 @@ public class PanView extends BaseMixView implements BeatstepView {
                 pan -= 1;
             }
 
+            this.surface.getDisplay ().notify ("Pan " + (selectedTrack.getPosition () + 1) + (isTurnedRight ? " right" : " left"));
             selectedTrack.setPan (pan);
         }
     }
@@ -56,8 +57,10 @@ public class PanView extends BaseMixView implements BeatstepView {
 
         final int track = this.getTrackFromPadNote (note);
         final ITrack selectedTrack = this.getTrackFromBank (track);
-        if (selectedTrack != null)
+        if (selectedTrack != null) {
+            this.surface.getDisplay ().notify ("Solo " + (selectedTrack.getPosition () + 1));
             selectedTrack.toggleSolo ();
+        }
     }
 
 

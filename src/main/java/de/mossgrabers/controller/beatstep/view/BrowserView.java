@@ -105,6 +105,9 @@ public class BrowserView extends AbstractView<BeatstepControlSurface, BeatstepCo
     @Override
     public void onGridNote (final int note, final int velocity)
     {
+        if (velocity == 0)
+            return;
+
         final IBrowser browser = this.model.getBrowser ();
         if (!browser.isActive ())
             return;
@@ -113,39 +116,33 @@ public class BrowserView extends AbstractView<BeatstepControlSurface, BeatstepCo
         {
             // Cancel
             case 0:
-                if (velocity == 0)
-                    return;
                 browser.stopBrowsing (false);
                 this.surface.getViewManager ().restore ();
+                this.surface.getDisplay ().notify ("Cancel");
                 break;
 
             // OK
             case 7:
-                if (velocity == 0)
-                    return;
                 browser.stopBrowsing (true);
                 this.surface.getViewManager ().restore ();
+                this.surface.getDisplay ().notify ("OK!");
                 break;
 
             // Notes for preview
             case 1:
-                if (velocity == 0)
-                    return;
+                this.surface.getDisplay ().notify ("Previous Tab");
                 browser.previousContentType();
                 break;
             case 2:
-                if (velocity == 0)
-                    return;
+                this.surface.getDisplay ().notify ("Next Tab");
                 browser.nextContentType();
                 break;
             case 5:
-                if (velocity == 0)
-                    return;
+                this.surface.getDisplay ().notify ("Previous");
                 browser.selectPreviousResult();
                 break;
             case 6:
-                if (velocity == 0)
-                    return;
+                this.surface.getDisplay ().notify ("Next");
                 browser.selectNextResult();
                 break;
 

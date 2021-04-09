@@ -55,39 +55,50 @@ public class TrackEditing
         switch (index)
         {
             case 0:
+                this.surface.getDisplay ().notify ("Volume " + (isTurnedRight ? "up" : "down"));
                 selectedTrack.get ().changeVolume (value);
                 break;
             case 1:
+                this.surface.getDisplay ().notify ("Pan " + (isTurnedRight ? "up" : "down"));
                 selectedTrack.get ().changePan (value);
                 break;
 
             case 2:
+                this.surface.getDisplay ().notify ((isTurnedRight ? "Mute" : "Unmute"));
                 selectedTrack.get ().setMute (isTurnedRight);
                 break;
 
             case 3:
+                this.surface.getDisplay ().notify ((isTurnedRight ? "Solo" : "Solo off"));
                 selectedTrack.get ().setSolo (isTurnedRight);
                 break;
 
             case 4:
+                this.surface.getDisplay ().notify ((isTurnedRight ? "Armed" : "Unarmed"));
                 selectedTrack.get ().setRecArm (isTurnedRight);
                 break;
 
             case 5:
+                this.surface.getDisplay ().notify ("Tempo " + (isTurnedRight ? "up" : "down"));
                 this.model.getTransport ().changeTempo (isTurnedRight, this.surface.isShiftPressed ());
                 break;
 
             case 6:
+                this.surface.getDisplay ().notify ("Move " + (isTurnedRight ? "right" : "left"));
                 this.model.getTransport ().changePosition (isTurnedRight, this.surface.isShiftPressed ());
                 break;
 
             case 7:
                 this.surface.getViewManager ().setActive (Views.DEVICE);
                 final ICursorDevice cd = this.model.getCursorDevice ();
-                if (this.model.hasSelectedDevice ())
+                if (this.model.hasSelectedDevice ()) {
+                    this.surface.getDisplay ().notify ("Replace device");
                     this.model.getBrowser ().replace (cd);
-                else
+                }
+                else {
+                    this.surface.getDisplay ().notify ("Add device after");
                     this.model.getBrowser ().insertAfterCursorDevice ();
+                }
                 break;
 
             // Send 1 - 4
@@ -95,8 +106,10 @@ public class TrackEditing
             case 9:
             case 10:
             case 11:
-                if (!this.model.isEffectTrackBankActive ())
+                if (!this.model.isEffectTrackBankActive ()) {
+                    this.surface.getDisplay ().notify ("Send: " + (index - 8) + (isTurnedRight ? " up" : " down"));
                     selectedTrack.get ().getSendBank ().getItem (index - 8).changeValue (value);
+                }
                 break;
 
             default:

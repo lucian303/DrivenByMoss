@@ -56,6 +56,7 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
         }
 
         cd.getParameterBank ().getItem (index - 8).changeValue (value);
+        this.surface.getDisplay ().notify ("Param: " + cd.getParameterBank ().getItem (index - 8).getName () + " (" + (isTurnedRight ? "up" : "down") + ")");
     }
 
 
@@ -74,6 +75,7 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
         {
             // Back to track view
             case 0:
+                this.surface.getDisplay ().notify ("Track");
                 this.surface.getViewManager ().setActive (Views.TRACK);
                 break;
 
@@ -92,6 +94,9 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
                 }
                 else
                     cd.selectPrevious ();
+
+                this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Previous Device: " + this.model.getCursorDevice ().getName ()), 150);
+
                 break;
 
             // Device Right
@@ -103,17 +108,22 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
                 }
                 else
                     cd.selectNext ();
+
+                this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Next Device: " + this.model.getCursorDevice ().getName ()), 150);
+
                 break;
 
             // Enter layer
             case 3:
                 // If no layer, show/hide the remote control param page
                 if (!cd.hasLayers ()) {
+                    this.surface.getDisplay ().notify ("Show Params");
                     cd.toggleParameterPageSectionVisible ();
 
                     return;
                 }
 
+                this.surface.getDisplay ().notify ("Into Layer");
                 if (this.isLayer)
                 {
                     if (sel.isPresent ())
@@ -123,12 +133,19 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
                     bank.getItem (0).select ();
 
                 this.isLayer = !this.isLayer;
+                this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Device: " + this.model.getCursorDevice ().getName ()), 150);
+
                 break;
 
             // Exit layer
             case 4:
                 // Toggle external VST window if not in layer
-                cd.toggleWindowOpen ();
+                if (!cd.hasLayers ()) {
+                    this.surface.getDisplay ().notify ("Device Details");
+                    cd.toggleWindowOpen ();
+
+                    return;
+                }
 
                 if (this.isLayer)
                     this.isLayer = false;
@@ -142,28 +159,38 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
                     }
                 }
 
+                this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Device: " + this.model.getCursorDevice ().getName ()), 150);
+
                 break;
 
             // Open browser / create device
             case 5:
-                if (this.model.hasSelectedDevice ())
+                if (this.model.hasSelectedDevice ()) {
+                    this.surface.getDisplay ().notify ("Replace Device");
                     this.model.getBrowser ().replace (cd);
-                else
+                }
+                else {
+                    this.surface.getDisplay ().notify ("Add after");
                     this.model.getBrowser ().insertAfterCursorDevice ();
+                }
                 break;
 
             // Param bank down
             case 6:
+                this.surface.getDisplay ().notify ("Previous Param Bank");
                 cd.getParameterBank ().scrollBackwards ();
                 break;
 
             // Param bank page up
             case 7:
+                this.surface.getDisplay ().notify ("Next Param Bank");
                 cd.getParameterBank ().scrollForwards ();
                 break;
 
             default:
-                cd.getParameterPageBank ().selectPage (note - 36 - 8);
+                final int paramBank = note - 36 - 8;
+                this.surface.getDisplay ().notify ("Param Bank: " + (paramBank + 1));
+                cd.getParameterPageBank ().selectPage (paramBank);
                 break;
         }
     }

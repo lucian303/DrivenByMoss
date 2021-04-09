@@ -82,6 +82,11 @@ public abstract class AbstractView<S extends IControlSurface<C>, C extends Confi
     @Override
     public void selectTrack (final int index)
     {
+        ITrack track = this.model.getCurrentTrackBank ().getItem (index);
+        final int trackNum = track.getPosition () + 1;
+        final String trackName = track.getName ();
+        this.surface.getDisplay ().notify ("Track: " + trackNum + ": " + trackName);
+
         this.model.getCurrentTrackBank ().getItem (index).select ();
     }
 

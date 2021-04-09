@@ -4,6 +4,7 @@
 
 package de.mossgrabers.controller.beatstep.view;
 
+import com.bitwig.extension.controller.api.TrackBank;
 import de.mossgrabers.controller.beatstep.BeatstepConfiguration;
 import de.mossgrabers.controller.beatstep.controller.BeatstepColorManager;
 import de.mossgrabers.controller.beatstep.controller.BeatstepControlSurface;
@@ -11,7 +12,6 @@ import de.mossgrabers.framework.controller.grid.IPadGrid;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.daw.data.bank.ITrackBank;
-import de.mossgrabers.framework.daw.resource.ChannelType;
 import de.mossgrabers.framework.featuregroup.AbstractView;
 import de.mossgrabers.framework.view.Views;
 
@@ -26,7 +26,6 @@ import java.util.Optional;
 public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConfiguration> implements BeatstepView
 {
     private TrackEditing extensions;
-
 
     /**
      * Constructor.
@@ -88,15 +87,19 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
         {
             // Toggle Solo
             case 0:
-                if (selectedTrack.isPresent ())
+                if (selectedTrack.isPresent ()) {
+                    this.surface.getDisplay ().notify ("Solo");
                     selectedTrack.get ().toggleSolo ();
+                }
                 break;
 
             // Track left
             case 1:
                 index = selectedTrack.isEmpty () ? 0 : selectedTrack.get ().getIndex () - 1;
-                if (index == -1 || this.surface.isShiftPressed ())
+                if (index == -1 || this.surface.isShiftPressed ()) {
                     tb.selectPreviousPage ();
+                    this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Previous Bank: " + this.getBank ()), 150);
+                }
                 else
                     this.selectTrack (index);
                 break;
@@ -104,36 +107,45 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
             // Track right
             case 2:
                 index = selectedTrack.isEmpty () ? 0 : selectedTrack.get ().getIndex () + 1;
-                if (index == 8 || this.surface.isShiftPressed ())
+                if (index == 8 || this.surface.isShiftPressed ()) {
                     tb.selectNextPage ();
+                    this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Next Bank: " + this.getBank ()), 150);
+                }
                 else
                     this.selectTrack (index);
                 break;
 
             // Move down
             case 3:
-                if (selectedTrack.isPresent ())
+                if (selectedTrack.isPresent ()) {
+                    this.surface.getDisplay ().notify ("Into group");
                     selectedTrack.get ().enter ();
+                }
                 break;
 
             // Move up
             case 4:
+                this.surface.getDisplay ().notify ("Out of group");
                 tb.selectParent ();
                 break;
 
             // Switch to device mode
             case 5:
+                this.surface.getDisplay ().notify ("Device");
                 this.surface.getViewManager ().setActive (Views.DEVICE);
                 break;
 
             // Track Page down
             case 6:
                 tb.selectPreviousPage ();
+                // Schedule a message to try to get the track number after the switch
+                this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Previous Bank: " + this.getBank ()), 150);
                 break;
 
             // Track Page up
             case 7:
                 tb.selectNextPage ();
+                this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Next Bank: " + this.getBank ()), 150);
                 break;
 
             default:
@@ -162,5 +174,16 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
         padGrid.light (41, BeatstepColorManager.BEATSTEP_BUTTON_STATE_PINK);
         padGrid.light (42, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
         padGrid.light (43, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
+    }
+
+    private String getBank ()
+    {
+        Optional<ITrack> track = this.model.getCurrentTrackBank ().getSelectedItem ();
+        if (track.isPresent ()) {
+            final int trackNum = track.get ().getPosition () + 1;
+            return (int) Math.ceil ((float) trackNum / 8) + " | Track: " + trackNum;
+        }
+
+        return "Couldn't get track number.";
     }
 }
