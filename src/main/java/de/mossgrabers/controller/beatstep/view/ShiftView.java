@@ -104,7 +104,7 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
 
             // Repeat
             case 2:
-                this.model.getTransport ().toggleLoop ();
+                this.model.getApplication ().redo ();
                 break;
 
             // Undo
