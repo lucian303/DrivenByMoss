@@ -94,43 +94,51 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
         {
             // Play
             case 0:
+                this.surface.getDisplay ().notify ("Play");
                 this.playCommand.executeNormal (ButtonEvent.UP);
                 break;
 
             // Record
             case 1:
+                this.surface.getDisplay ().notify ("Record");
                 this.model.getTransport ().record ();
                 break;
 
             // Repeat
             case 2:
+                this.surface.getDisplay ().notify ("Redo");
                 this.model.getApplication ().redo ();
                 break;
 
             // Undo
             case 3:
+                this.surface.getDisplay ().notify ("Undo");
                 this.model.getApplication ().undo ();
                 break;
 
             // Toggle window of VSTs
             case 4:
+                this.surface.getDisplay ().notify ("Device Window");
                 cursorDevice.toggleWindowOpen ();
                 break;
 
             // Insert device before current
             case 5:
+                this.surface.getDisplay ().notify ("Add before");
                 this.model.getBrowser ().insertBeforeCursorDevice ();
                 this.surface.getViewManager ().setActive (Views.DEVICE);
                 break;
 
             // Insert device after current
             case 6:
+                this.surface.getDisplay ().notify ("Add after");
                 this.model.getBrowser ().insertAfterCursorDevice ();
                 this.surface.getViewManager ().setActive (Views.DEVICE);
                 break;
 
             // Switch layouts
             case 7:
+                this.surface.getDisplay ().notify ("Toggle Layout");
                 IApplication app = this.model.getApplication ();
                 if (!app.isMixerLayout ())
                     app.setPanelLayout ("MIX");
@@ -160,6 +168,7 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
         switch (index) {
             // Save document
             case 7:
+                this.surface.getDisplay ().notify ("Save");
                 this.model.getProject ().save ();
                 break;
         }
