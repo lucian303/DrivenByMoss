@@ -157,6 +157,11 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
     @Override
     public void onKnob (final int index, final int value, final boolean isTurnedRight)
     {
-        // Knobs not used in Shift view
+        switch (index) {
+            // Save document
+            case 7:
+                this.model.getProject ().save ();
+                break;
+        }
     }
 }
