@@ -128,7 +128,7 @@ public class BrowserView extends AbstractView<BeatstepControlSurface, BeatstepCo
                 this.surface.getDisplay ().notify ("OK!");
                 break;
 
-            // Notes for preview
+            // Tabs
             case 1:
                 this.surface.getDisplay ().notify ("Previous Tab");
                 browser.previousContentType();
@@ -137,6 +137,8 @@ public class BrowserView extends AbstractView<BeatstepControlSurface, BeatstepCo
                 this.surface.getDisplay ().notify ("Next Tab");
                 browser.nextContentType();
                 break;
+
+            // Next / Previous Patch
             case 5:
                 this.surface.getDisplay ().notify ("Previous");
                 browser.selectPreviousResult();

@@ -123,9 +123,9 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
                     return;
                 }
 
-                this.surface.getDisplay ().notify ("Into Layer");
                 if (this.isLayer)
                 {
+                    this.surface.getDisplay ().notify ("Into Layer");
                     if (sel.isPresent ())
                         sel.get ().enter ();
                 }
@@ -140,17 +140,17 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
             // Exit layer
             case 4:
                 // Toggle external VST window if not in layer
-                if (!cd.hasLayers ()) {
+                if (!this.isLayer && !cd.isNested ()) {
                     this.surface.getDisplay ().notify ("Device Details");
                     cd.toggleWindowOpen ();
 
                     return;
                 }
 
-                if (this.isLayer)
+                if (this.isLayer) {
+                    this.surface.getDisplay ().notify ("Out of Layer");
                     this.isLayer = false;
-                else
-                {
+                } else {
                     if (cd.isNested ())
                     {
                         cd.selectParent ();
