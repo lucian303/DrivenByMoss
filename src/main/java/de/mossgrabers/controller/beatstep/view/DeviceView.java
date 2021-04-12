@@ -73,10 +73,9 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
 
         switch (note - 36)
         {
-            // Back to track view
+            // Toggle device on/off
             case 0:
-                this.surface.getDisplay ().notify ("Track");
-                this.surface.getViewManager ().setActive (Views.TRACK);
+                cd.toggleEnabledState ();
                 break;
 
             // Device Left
