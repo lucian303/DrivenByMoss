@@ -213,7 +213,7 @@ public class BeatstepControllerSetup extends AbstractControllerSetup<BeatstepCon
             this.addRelativeKnob (ContinuousID.get (ContinuousID.DEVICE_KNOB1, i), "Knob " + (i + 9), new KnobRowViewCommand (i + 8, this.model, surface), BindType.CC, 2, BeatstepControlSurface.BEATSTEP_KNOB_9 + i, RelativeEncoding.OFFSET_BINARY);
         }
 
-        this.addRelativeKnob (ContinuousID.MASTER_KNOB, "Master", new PlayPositionCommand<> (this.model, surface), BindType.CC, 2, BeatstepControlSurface.BEATSTEP_KNOB_MAIN, RelativeEncoding.OFFSET_BINARY);
+        this.addRelativeKnob (ContinuousID.MASTER_KNOB, "Master", new KnobRowViewCommand (16, this.model, surface), BindType.CC, 2, BeatstepControlSurface.BEATSTEP_KNOB_MAIN, RelativeEncoding.OFFSET_BINARY);
 
         final PlayView playView = (PlayView) viewManager.get (Views.PLAY);
         playView.registerAftertouchCommand (new AftertouchAbstractViewCommand<> (playView, this.model, surface));

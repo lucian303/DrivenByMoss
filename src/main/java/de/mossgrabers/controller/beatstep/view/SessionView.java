@@ -41,7 +41,7 @@ public class SessionView extends AbstractView<BeatstepControlSurface, BeatstepCo
     public void onKnob (final int index, final int value, final boolean isTurnedRight)
     {
         // Knob 12-15 are currently not used
-        if (index < 12)
+        if (index < 12 || index == 16)
             this.extensions.onTrackKnob (index, value, isTurnedRight);
     }
 

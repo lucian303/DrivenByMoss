@@ -44,7 +44,7 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
     @Override
     public void onKnob (final int index, final int value, final boolean isTurnedRight)
     {
-        if (index < 12)
+        if (index < 12 || index == 16)
         {
             this.extensions.onTrackKnob (index, value, isTurnedRight);
             return;
@@ -174,16 +174,5 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
         padGrid.light (41, BeatstepColorManager.BEATSTEP_BUTTON_STATE_PINK);
         padGrid.light (42, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
         padGrid.light (43, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
-    }
-
-    private String getBank ()
-    {
-        Optional<ITrack> track = this.model.getCurrentTrackBank ().getSelectedItem ();
-        if (track.isPresent ()) {
-            final int trackNum = track.get ().getPosition () + 1;
-            return (int) Math.ceil ((float) trackNum / 8) + " | Track: " + trackNum;
-        }
-
-        return "Couldn't get track number.";
     }
 }

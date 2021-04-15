@@ -49,7 +49,7 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
     public void onKnob (final int index, final int value, final boolean isTurnedRight)
     {
         final ICursorDevice cd = this.model.getCursorDevice ();
-        if (index < 8)
+        if (index < 8 || index == 16)
         {
             this.extensions.onTrackKnob (index, value, isTurnedRight);
             return;

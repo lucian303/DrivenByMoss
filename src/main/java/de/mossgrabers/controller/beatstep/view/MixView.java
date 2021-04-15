@@ -17,6 +17,8 @@ import de.mossgrabers.framework.daw.data.ITrack;
  * @author Lucian Hontau
  */
 public class MixView extends BaseMixView implements BeatstepView {
+    private TrackEditing extensions;
+
     /**
      * Constructor.
      *
@@ -25,6 +27,8 @@ public class MixView extends BaseMixView implements BeatstepView {
      */
     public MixView (final BeatstepControlSurface surface, final IModel model) {
         super ("Mix", surface, model);
+
+        this.extensions = new TrackEditing (surface, model);
     }
 
     /**
@@ -32,6 +36,12 @@ public class MixView extends BaseMixView implements BeatstepView {
      */
     @Override
     public void onKnob (final int index, final int value, final boolean isTurnedRight) {
+        if (index == 16)
+        {
+            this.extensions.onTrackKnob (index, value, isTurnedRight);
+            return;
+        }
+
         final ITrack selectedTrack = this.getTrackFromBank (index);
         if (selectedTrack != null) {
             int vol = selectedTrack.getVolume ();

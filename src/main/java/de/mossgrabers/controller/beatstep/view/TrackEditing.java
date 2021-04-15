@@ -9,6 +9,7 @@ import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.data.ICursorDevice;
 import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.daw.data.bank.ITrackBank;
+import de.mossgrabers.framework.featuregroup.AbstractView;
 import de.mossgrabers.framework.view.Views;
 
 import java.util.Optional;
@@ -19,7 +20,7 @@ import java.util.Optional;
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
-public class TrackEditing
+public class TrackEditing extends AbstractView
 {
     private BeatstepControlSurface surface;
     private IModel                 model;
@@ -33,6 +34,7 @@ public class TrackEditing
      */
     public TrackEditing (final BeatstepControlSurface surface, final IModel model)
     {
+        super("Track Editing", surface, model);
         this.surface = surface;
         this.model = model;
     }
@@ -112,9 +114,38 @@ public class TrackEditing
                 }
                 break;
 
+            // Big knob
+            case 16:
+                if (isTurnedRight) {
+                    int knobIndex2 = selectedTrack.get ().getIndex () + 1;
+                    if (knobIndex2 >= 8 || this.surface.isShiftPressed ()) {
+                        tb.selectNextPage ();
+                        this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Next Bank: " + this.getBank ()), 150);
+                    } else
+                        this.selectTrack (knobIndex2);
+                } else {
+                    int knobIndex = selectedTrack.get ().getIndex () - 1;
+                    if (knobIndex < 0 || this.surface.isShiftPressed ()) {
+                        tb.selectPreviousPage ();
+                        this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Previous Bank: " + this.getBank ()), 150);
+                    }
+                    else
+                        this.selectTrack (knobIndex);
+                }
+
+                break;
+
             default:
                 // Not used
                 break;
         }
+    }
+
+    @Override
+    public void drawGrid () {
+    }
+
+    @Override
+    public void onGridNote (int note, int velocity) {
     }
 }
