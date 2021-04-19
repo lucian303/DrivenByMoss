@@ -166,6 +166,13 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
     public void onKnob (final int index, final int value, final boolean isTurnedRight)
     {
         switch (index) {
+            // Hide/show VST window (show window, then save to make sure Maschine settings are saved)
+            case 6:
+                this.surface.getDisplay ().notify ("Device Window");
+                final ICursorDevice cursorDevice = this.model.getCursorDevice ();
+                cursorDevice.toggleWindowOpen ();
+                break;
+
             // Save document
             case 7:
                 this.surface.getDisplay ().notify ("Save");
