@@ -15,6 +15,7 @@ import de.mossgrabers.framework.daw.DAWColor;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.INoteClip;
 import de.mossgrabers.framework.daw.IStepInfo;
+import de.mossgrabers.framework.daw.StepState;
 import de.mossgrabers.framework.daw.constants.Resolution;
 import de.mossgrabers.framework.daw.data.IChannel;
 import de.mossgrabers.framework.daw.data.IDrumDevice;
@@ -70,6 +71,7 @@ public abstract class AbstractDrumView<S extends IControlSurface<C>, C extends C
     protected int              selectedPad;
     protected int              scrollPosition        = -1;
 
+    protected ButtonID         firstPad              = ButtonID.PAD1;
     protected ButtonID         buttonSelect          = ButtonID.SELECT;
     protected ButtonID         buttonBrowse          = ButtonID.BROWSE;
     protected ButtonID         buttonSolo            = ButtonID.SOLO;
@@ -117,9 +119,6 @@ public abstract class AbstractDrumView<S extends IControlSurface<C>, C extends C
         this.numColumns = numColumns;
         this.sequencerSteps = numSequencerLines * this.numColumns;
         this.playColumns = 4; // This layout is currently fixed to a 4 width
-
-        this.canScrollUp = false;
-        this.canScrollDown = false;
 
         final ITrackBank tb = model.getTrackBank ();
         tb.addSelectionObserver ( (index, isSelected) -> this.keyManager.clearPressedKeys ());
@@ -276,12 +275,28 @@ public abstract class AbstractDrumView<S extends IControlSurface<C>, C extends C
         final int channel = this.configuration.getMidiEditChannel ();
         final int step = this.numColumns * (this.allRows - 1 - y) + x;
         final int note = offsetY + this.selectedPad;
-        final int vel = this.configuration.isAccentActive () ? this.configuration.getFixedAccentValue () : this.surface.getButton (ButtonID.get (ButtonID.PAD1, index)).getPressedVelocity ();
+        final int vel = this.getVelocity (index);
 
         if (this.handleSequencerAreaButtonCombinations (clip, channel, step, note, vel))
             return;
 
         clip.toggleStep (channel, step, note, vel);
+    }
+
+
+    /**
+     * Get the velocity of the played pad. Either it is fixed in the settings or the stored value
+     * from the down event.
+     *
+     * @param index The index of the pad
+     * @return The velocity
+     */
+    protected int getVelocity (final int index)
+    {
+        if (this.configuration.isAccentActive ())
+            return this.configuration.getFixedAccentValue ();
+        final IHwButton button = this.surface.getButton (ButtonID.get (this.firstPad, index));
+        return button.getPressedVelocity ();
     }
 
 
@@ -303,7 +318,7 @@ public abstract class AbstractDrumView<S extends IControlSurface<C>, C extends C
         {
             duplicateButton.setConsumed ();
             final IStepInfo noteStep = clip.getStep (channel, step, note);
-            if (noteStep.getState () == IStepInfo.NOTE_START)
+            if (noteStep.getState () == StepState.START)
                 this.copyNote = noteStep;
             else if (this.copyNote != null)
                 clip.setStep (channel, step, note, this.copyNote);
@@ -311,19 +326,17 @@ public abstract class AbstractDrumView<S extends IControlSurface<C>, C extends C
         }
 
         // Change length of a note or create a new one with a length
-        for (int s = step - 1; s >= 0; s--)
+        for (int s = 0; s < step; s++)
         {
-            final int x = s % this.numColumns;
-            final int y = this.allRows - 1 - s / this.numColumns;
-            final int pad = y * this.numColumns + x;
-            final IHwButton button = this.surface.getButton (ButtonID.get (ButtonID.PAD1, pad));
+            final int pad = this.getPadIndex (s);
+            final IHwButton button = this.surface.getButton (ButtonID.get (this.firstPad, pad));
             if (button.isLongPressed ())
             {
                 button.setConsumed ();
                 final int length = step - s + 1;
                 final double duration = length * Resolution.getValueAt (this.getResolutionIndex ());
-                final int state = note < 0 ? 0 : clip.getStep (channel, s, note).getState ();
-                if (state == IStepInfo.NOTE_START)
+                final StepState state = note < 0 ? StepState.OFF : clip.getStep (channel, s, note).getState ();
+                if (state == StepState.START)
                     clip.updateStepDuration (channel, s, note, duration);
                 else
                     clip.setStep (channel, s, note, velocity, duration);
@@ -332,6 +345,20 @@ public abstract class AbstractDrumView<S extends IControlSurface<C>, C extends C
         }
 
         return false;
+    }
+
+
+    /**
+     * Calculate the index of the pad from the given sequencer step.
+     *
+     * @param step The step
+     * @return The pad index
+     */
+    protected int getPadIndex (final int step)
+    {
+        final int x = step % this.numColumns;
+        final int y = this.allRows - 1 - step / this.numColumns;
+        return y * this.numColumns + x;
     }
 
 
@@ -459,20 +486,26 @@ public abstract class AbstractDrumView<S extends IControlSurface<C>, C extends C
     }
 
 
-    protected String getStepColor (final int isSet, final boolean hilite, final Optional<ColorEx> rowColor)
+    protected String getStepColor (final IStepInfo stepInfo, final boolean hilite, final Optional<ColorEx> rowColor)
     {
-        switch (isSet)
+        switch (stepInfo.getState ())
         {
-            // Note continues
-            case IStepInfo.NOTE_CONTINUE:
-                if (hilite)
-                    return AbstractSequencerView.COLOR_STEP_HILITE_CONTENT;
-                return rowColor.isPresent () && this.useDawColors ? DAWColor.getColorIndex (ColorEx.darker (rowColor.get ())) : AbstractSequencerView.COLOR_CONTENT_CONT;
             // Note starts
-            case IStepInfo.NOTE_START:
+            case START:
                 if (hilite)
                     return AbstractSequencerView.COLOR_STEP_HILITE_CONTENT;
+                if (stepInfo.isMuted ())
+                    return COLOR_STEP_MUTED;
                 return rowColor.isPresent () && this.useDawColors ? DAWColor.getColorIndex (rowColor.get ()) : AbstractSequencerView.COLOR_CONTENT;
+
+            // Note continues
+            case CONTINUE:
+                if (hilite)
+                    return AbstractSequencerView.COLOR_STEP_HILITE_CONTENT;
+                if (stepInfo.isMuted ())
+                    return COLOR_STEP_MUTED_CONT;
+                return rowColor.isPresent () && this.useDawColors ? DAWColor.getColorIndex (ColorEx.darker (rowColor.get ())) : AbstractSequencerView.COLOR_CONTENT_CONT;
+
             // Empty
             default:
                 return hilite ? AbstractSequencerView.COLOR_STEP_HILITE_NO_CONTENT : AbstractSequencerView.COLOR_NO_CONTENT;
@@ -771,13 +804,13 @@ public abstract class AbstractDrumView<S extends IControlSurface<C>, C extends C
         final IPadGrid padGrid = this.surface.getPadGrid ();
         for (int col = 0; col < this.sequencerSteps; col++)
         {
-            final int isSet = clip.getStep (editMidiChannel, col, noteRow).getState ();
+            final IStepInfo stepInfo = clip.getStep (editMidiChannel, col, noteRow);
             final boolean hilite = col == hiStep;
             final int x = col % this.numColumns;
             int y = col / this.numColumns;
             if (yModifier != null)
                 y = yModifier.applyAsInt (y);
-            padGrid.lightEx (x, y, isActive ? this.getStepColor (isSet, hilite, rowColor) : AbstractSequencerView.COLOR_NO_CONTENT);
+            padGrid.lightEx (x, y, isActive ? this.getStepColor (stepInfo, hilite, rowColor) : AbstractSequencerView.COLOR_NO_CONTENT);
         }
     }
 

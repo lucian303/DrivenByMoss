@@ -70,7 +70,7 @@ public abstract class AbstractControllerExtensionDefinition extends ControllerEx
     @Override
     public String getHelpFilePath ()
     {
-        return "Help.html";
+        return "DrivenByMoss-Manual.pdf";
     }
 
 
@@ -111,7 +111,7 @@ public abstract class AbstractControllerExtensionDefinition extends ControllerEx
     @Override
     public int getRequiredAPIVersion ()
     {
-        return 12;
+        return 14;
     }
 
 

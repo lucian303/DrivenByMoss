@@ -37,11 +37,6 @@ public abstract class AbstractView<S extends IControlSurface<C>, C extends Confi
 
     private AftertouchCommand     aftertouchCommand;
 
-    protected boolean             canScrollLeft;
-    protected boolean             canScrollRight;
-    protected boolean             canScrollUp;
-    protected boolean             canScrollDown;
-
 
     /**
      * Constructor.
@@ -56,11 +51,6 @@ public abstract class AbstractView<S extends IControlSurface<C>, C extends Confi
 
         this.scales = model.getScales ();
         this.keyManager = new KeyManager (model, this.scales, surface.getPadGrid ());
-
-        this.canScrollLeft = true;
-        this.canScrollRight = true;
-        this.canScrollUp = true;
-        this.canScrollDown = true;
     }
 
 
@@ -183,6 +173,14 @@ public abstract class AbstractView<S extends IControlSurface<C>, C extends Confi
     }
 
 
+    /** {@inheritDoc} */
+    @Override
+    public KeyManager getKeyManager ()
+    {
+        return this.keyManager;
+    }
+
+
     protected void delayedUpdateNoteMapping (final int [] matrix)
     {
         this.surface.scheduleTask ( () -> {
@@ -190,17 +188,6 @@ public abstract class AbstractView<S extends IControlSurface<C>, C extends Confi
             if (matrix.length == 128)
                 this.surface.setKeyTranslationTable (this.scales.translateMatrixToGrid (matrix));
         }, 6);
-    }
-
-
-    /**
-     * Get the key manager.
-     *
-     * @return The key manager
-     */
-    public KeyManager getKeyManager ()
-    {
-        return this.keyManager;
     }
 
 
