@@ -11,6 +11,8 @@ import de.mossgrabers.controller.arturia.beatstep.controller.BeatstepPadGrid;
 import de.mossgrabers.controller.arturia.beatstep.view.BrowserView;
 import de.mossgrabers.controller.arturia.beatstep.view.DeviceView;
 import de.mossgrabers.controller.arturia.beatstep.view.DrumView;
+import de.mossgrabers.controller.arturia.beatstep.view.MixView;
+import de.mossgrabers.controller.arturia.beatstep.view.PanView;
 import de.mossgrabers.controller.arturia.beatstep.view.PlayView;
 import de.mossgrabers.controller.arturia.beatstep.view.SequencerView;
 import de.mossgrabers.controller.arturia.beatstep.view.SessionView;

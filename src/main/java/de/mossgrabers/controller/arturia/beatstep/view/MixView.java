@@ -2,10 +2,10 @@
 // (c) 2021
 // Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt
 
-package de.mossgrabers.controller.beatstep.view;
+package de.mossgrabers.controller.arturia.beatstep.view;
 
-import de.mossgrabers.controller.beatstep.controller.BeatstepColorManager;
-import de.mossgrabers.controller.beatstep.controller.BeatstepControlSurface;
+import de.mossgrabers.controller.arturia.beatstep.controller.BeatstepColorManager;
+import de.mossgrabers.controller.arturia.beatstep.controller.BeatstepControlSurface;
 import de.mossgrabers.framework.controller.grid.IPadGrid;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.data.ITrack;
@@ -16,15 +16,19 @@ import de.mossgrabers.framework.daw.data.ITrack;
  *
  * @author Lucian Hontau
  */
-public class PanView extends BaseMixView implements BeatstepView {
+public class MixView extends BaseMixView implements BeatstepView {
+    private TrackEditing extensions;
+
     /**
      * Constructor.
      *
      * @param surface The controller
      * @param model   The model
      */
-    public PanView (final BeatstepControlSurface surface, final IModel model) {
-        super ("Pan", surface, model);
+    public MixView (final BeatstepControlSurface surface, final IModel model) {
+        super ("Mix", surface, model);
+
+        this.extensions = new TrackEditing (surface, model);
     }
 
     /**
@@ -32,17 +36,23 @@ public class PanView extends BaseMixView implements BeatstepView {
      */
     @Override
     public void onKnob (final int index, final int value, final boolean isTurnedRight) {
+        if (index == 16)
+        {
+            this.extensions.onTrackKnob (index, value, isTurnedRight);
+            return;
+        }
+
         final ITrack selectedTrack = this.getTrackFromBank (index);
         if (selectedTrack != null) {
-            int pan = selectedTrack.getPan ();
+            int vol = selectedTrack.getVolume ();
             if (isTurnedRight) {
-                pan += 1;
+                vol += 1;
             } else {
-                pan -= 1;
+                vol -= 1;
             }
 
-            this.surface.getDisplay ().notify ("Pan " + (selectedTrack.getPosition () + 1) + (isTurnedRight ? " right" : " left"));
-            selectedTrack.setPan (pan);
+            this.surface.getDisplay ().notify ("Volume " + (selectedTrack.getPosition () + 1) + (isTurnedRight ? " up" : " down"));
+            selectedTrack.setVolume (vol);
         }
     }
 
@@ -58,8 +68,9 @@ public class PanView extends BaseMixView implements BeatstepView {
         final int track = this.getTrackFromPadNote (note);
         final ITrack selectedTrack = this.getTrackFromBank (track);
         if (selectedTrack != null) {
-            this.surface.getDisplay ().notify ("Solo " + (selectedTrack.getPosition () + 1));
-            selectedTrack.toggleSolo ();
+            this.surface.getDisplay ().notify ("Mute " + (selectedTrack.getPosition () + 1));
+
+            selectedTrack.toggleMute ();
         }
     }
 
