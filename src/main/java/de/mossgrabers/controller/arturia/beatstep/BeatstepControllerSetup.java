@@ -11,6 +11,8 @@ import de.mossgrabers.controller.arturia.beatstep.controller.BeatstepPadGrid;
 import de.mossgrabers.controller.arturia.beatstep.view.BrowserView;
 import de.mossgrabers.controller.arturia.beatstep.view.DeviceView;
 import de.mossgrabers.controller.arturia.beatstep.view.DrumView;
+import de.mossgrabers.controller.arturia.beatstep.view.MixView;
+import de.mossgrabers.controller.arturia.beatstep.view.PanView;
 import de.mossgrabers.controller.arturia.beatstep.view.PlayView;
 import de.mossgrabers.controller.arturia.beatstep.view.SequencerView;
 import de.mossgrabers.controller.arturia.beatstep.view.SessionView;
@@ -146,6 +148,9 @@ public class BeatstepControllerSetup extends AbstractControllerSetup<BeatstepCon
 
         viewManager.register (Views.BROWSER, new BrowserView (surface, this.model));
         viewManager.register (Views.SHIFT, new ShiftView (surface, this.model));
+
+        viewManager.register (Views.MIX, new MixView (surface, this.model));
+        viewManager.register (Views.TRACK_PAN, new PanView (surface, this.model));
     }
 
 
@@ -217,7 +222,7 @@ public class BeatstepControllerSetup extends AbstractControllerSetup<BeatstepCon
             this.addRelativeKnob (ContinuousID.get (ContinuousID.DEVICE_KNOB1, i), "Knob " + (i + 9), new KnobRowViewCommand (i + 8, this.model, surface), BindType.CC, 2, BeatstepControlSurface.BEATSTEP_KNOB_9 + i, RelativeEncoding.OFFSET_BINARY);
         }
 
-        this.addRelativeKnob (ContinuousID.MASTER_KNOB, "Master", new PlayPositionCommand<> (this.model, surface), BindType.CC, 2, BeatstepControlSurface.BEATSTEP_KNOB_MAIN, RelativeEncoding.OFFSET_BINARY);
+        this.addRelativeKnob (ContinuousID.MASTER_KNOB, "Master", new KnobRowViewCommand (16, this.model, surface), BindType.CC, 2, BeatstepControlSurface.BEATSTEP_KNOB_MAIN, RelativeEncoding.OFFSET_BINARY);
 
         final PlayView playView = (PlayView) viewManager.get (Views.PLAY);
         playView.registerAftertouchCommand (new AftertouchViewCommand<> (playView, this.model, surface));

@@ -9,6 +9,7 @@ import de.mossgrabers.controller.arturia.beatstep.controller.BeatstepColorManage
 import de.mossgrabers.controller.arturia.beatstep.controller.BeatstepControlSurface;
 import de.mossgrabers.framework.command.trigger.transport.PlayCommand;
 import de.mossgrabers.framework.controller.grid.IPadGrid;
+import de.mossgrabers.framework.daw.IApplication;
 import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.ITransport;
 import de.mossgrabers.framework.daw.data.ICursorDevice;
@@ -33,7 +34,9 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
         Views.PLAY,
         Views.DRUM,
         Views.SEQUENCER,
-        Views.SESSION
+        Views.SESSION,
+        Views.MIX,
+        Views.TRACK_PAN
     };
 
     private PlayCommand<BeatstepControlSurface, BeatstepConfiguration> playCommand;
@@ -91,52 +94,61 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
         {
             // Play
             case 0:
-                this.playCommand.executeNormal (ButtonEvent.DOWN);
+                this.surface.getDisplay ().notify ("Play");
+                this.playCommand.executeNormal (ButtonEvent.UP);
                 break;
 
             // Record
             case 1:
+                this.surface.getDisplay ().notify ("Record");
                 this.model.getTransport ().record ();
                 break;
 
             // Repeat
             case 2:
-                this.model.getTransport ().toggleLoop ();
+                this.surface.getDisplay ().notify ("Redo");
+                this.model.getApplication ().redo ();
                 break;
 
-            // Click
+            // Undo
             case 3:
-                this.model.getTransport ().toggleMetronome ();
+                this.surface.getDisplay ().notify ("Undo");
+                this.model.getApplication ().undo ();
                 break;
 
-            // Tap Tempo
+            // Toggle window of VSTs
             case 4:
-                this.model.getTransport ().tapTempo ();
+                this.surface.getDisplay ().notify ("Device Window");
+                cursorDevice.toggleWindowOpen ();
                 break;
 
             // Insert device before current
             case 5:
+                this.surface.getDisplay ().notify ("Add before");
                 this.model.getBrowser ().insertBeforeCursorDevice ();
+                this.surface.getViewManager ().setActive (Views.DEVICE);
                 break;
 
             // Insert device after current
             case 6:
+                this.surface.getDisplay ().notify ("Add after");
                 this.model.getBrowser ().insertAfterCursorDevice ();
+                this.surface.getViewManager ().setActive (Views.DEVICE);
                 break;
 
-            // Open the browser
+            // Switch layouts
             case 7:
-                this.model.getBrowser ().replace (cursorDevice);
-                break;
-
-            // Toggle window of VSTs
-            case 15:
-                cursorDevice.toggleWindowOpen ();
+                this.surface.getDisplay ().notify ("Toggle Layout");
+                IApplication app = this.model.getApplication ();
+                if (!app.isMixerLayout ())
+                    app.setPanelLayout ("MIX");
+                else
+                    app.setPanelLayout ("ARRANGE");
                 break;
 
             default:
                 viewIndex = note - 44;
-                if (viewIndex < 0 || viewIndex >= 6)
+                if (viewIndex < 0 || viewIndex >= 8)
                     return;
 
                 final ViewManager viewManager = this.surface.getViewManager ();
@@ -153,6 +165,19 @@ public class ShiftView extends AbstractView<BeatstepControlSurface, BeatstepConf
     @Override
     public void onKnob (final int index, final int value, final boolean isTurnedRight)
     {
-        // Knobs not used in Shift view
+        switch (index) {
+            // Hide/show VST window (show window, then save to make sure Maschine settings are saved)
+            case 6:
+                this.surface.getDisplay ().notify ("Device Window");
+                final ICursorDevice cursorDevice = this.model.getCursorDevice ();
+                cursorDevice.toggleWindowOpen ();
+                break;
+
+            // Save document
+            case 7:
+                this.surface.getDisplay ().notify ("Save");
+                this.model.getProject ().save ();
+                break;
+        }
     }
 }

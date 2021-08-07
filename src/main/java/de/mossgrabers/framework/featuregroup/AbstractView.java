@@ -17,6 +17,8 @@ import de.mossgrabers.framework.scale.Scales;
 import de.mossgrabers.framework.utils.ButtonEvent;
 import de.mossgrabers.framework.utils.KeyManager;
 
+import java.util.Optional;
+
 
 /**
  * Abstract implementation of a view.
@@ -72,6 +74,11 @@ public abstract class AbstractView<S extends IControlSurface<C>, C extends Confi
     @Override
     public void selectTrack (final int index)
     {
+        ITrack track = this.model.getCurrentTrackBank ().getItem (index);
+        final int trackNum = track.getPosition () + 1;
+        final String trackName = track.getName ();
+        this.surface.getDisplay ().notify ("Track: " + trackNum + ": " + trackName);
+
         this.model.getCurrentTrackBank ().getItem (index).select ();
     }
 
@@ -227,5 +234,21 @@ public abstract class AbstractView<S extends IControlSurface<C>, C extends Confi
         final AbstractTriggerCommand<?, ?> triggerCommand = (AbstractTriggerCommand<?, ?>) button.getCommand ();
         triggerCommand.executeShifted (ButtonEvent.DOWN);
         triggerCommand.executeShifted (ButtonEvent.UP);
+    }
+
+    /**
+     * Get the current bank of 8 the track cursor is in
+     *
+     * @return String The bank number
+     */
+    protected String getBank ()
+    {
+        Optional<ITrack> track = this.model.getCurrentTrackBank ().getSelectedItem ();
+        if (track.isPresent ()) {
+            final int trackNum = track.get ().getPosition () + 1;
+            return (int) Math.ceil ((float) trackNum / 8) + " | Track: " + trackNum;
+        }
+
+        return "Couldn't get track number.";
     }
 }

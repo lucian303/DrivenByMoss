@@ -4,6 +4,7 @@
 
 package de.mossgrabers.controller.arturia.beatstep.view;
 
+import com.bitwig.extension.controller.api.TrackBank;
 import de.mossgrabers.controller.arturia.beatstep.BeatstepConfiguration;
 import de.mossgrabers.controller.arturia.beatstep.controller.BeatstepColorManager;
 import de.mossgrabers.controller.arturia.beatstep.controller.BeatstepControlSurface;
@@ -12,6 +13,7 @@ import de.mossgrabers.framework.daw.IModel;
 import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.daw.data.bank.ITrackBank;
 import de.mossgrabers.framework.featuregroup.AbstractView;
+import de.mossgrabers.framework.view.Views;
 
 import java.util.Optional;
 
@@ -24,7 +26,6 @@ import java.util.Optional;
 public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConfiguration> implements BeatstepView
 {
     private TrackEditing extensions;
-
 
     /**
      * Constructor.
@@ -43,7 +44,7 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
     @Override
     public void onKnob (final int index, final int value, final boolean isTurnedRight)
     {
-        if (index < 12)
+        if (index < 12 || index == 16)
         {
             this.extensions.onTrackKnob (index, value, isTurnedRight);
             return;
@@ -61,15 +62,6 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
             case 13:
                 if (!this.model.isEffectTrackBankActive ())
                     selectedTrack.get ().getSendBank ().getItem (index - 8).changeValue (value);
-                break;
-
-            case 14:
-                // Not used
-                break;
-
-            // Crossfader
-            case 15:
-                this.model.getTransport ().changeCrossfade (value);
                 break;
 
             default:
@@ -93,18 +85,21 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
         int index;
         switch (note - 36)
         {
-            // Toggle Activate
+            // Toggle Solo
             case 0:
-
-                if (selectedTrack.isPresent ())
-                    selectedTrack.get ().toggleIsActivated ();
+                if (selectedTrack.isPresent ()) {
+                    this.surface.getDisplay ().notify ("Solo");
+                    selectedTrack.get ().toggleSolo ();
+                }
                 break;
 
             // Track left
             case 1:
                 index = selectedTrack.isEmpty () ? 0 : selectedTrack.get ().getIndex () - 1;
-                if (index == -1 || this.surface.isShiftPressed ())
+                if (index == -1 || this.surface.isShiftPressed ()) {
                     tb.selectPreviousPage ();
+                    this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Previous Bank: " + this.getBank ()), 150);
+                }
                 else
                     this.selectTrack (index);
                 break;
@@ -112,35 +107,45 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
             // Track right
             case 2:
                 index = selectedTrack.isEmpty () ? 0 : selectedTrack.get ().getIndex () + 1;
-                if (index == 8 || this.surface.isShiftPressed ())
+                if (index == 8 || this.surface.isShiftPressed ()) {
                     tb.selectNextPage ();
+                    this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Next Bank: " + this.getBank ()), 150);
+                }
                 else
                     this.selectTrack (index);
                 break;
 
             // Move down
             case 3:
-                if (selectedTrack.isPresent ())
+                if (selectedTrack.isPresent ()) {
+                    this.surface.getDisplay ().notify ("Into group");
                     selectedTrack.get ().enter ();
+                }
                 break;
 
             // Move up
             case 4:
+                this.surface.getDisplay ().notify ("Out of group");
                 tb.selectParent ();
                 break;
 
-            // Unused
+            // Switch to device mode
             case 5:
+                this.surface.getDisplay ().notify ("Device");
+                this.surface.getViewManager ().setActive (Views.DEVICE);
                 break;
 
             // Track Page down
             case 6:
                 tb.selectPreviousPage ();
+                // Schedule a message to try to get the track number after the switch
+                this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Previous Bank: " + this.getBank ()), 150);
                 break;
 
             // Track Page up
             case 7:
                 tb.selectNextPage ();
+                this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Next Bank: " + this.getBank ()), 150);
                 break;
 
             default:
@@ -166,7 +171,7 @@ public class TrackView extends AbstractView<BeatstepControlSurface, BeatstepConf
         padGrid.light (38, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
         padGrid.light (39, BeatstepColorManager.BEATSTEP_BUTTON_STATE_RED);
         padGrid.light (40, BeatstepColorManager.BEATSTEP_BUTTON_STATE_RED);
-        padGrid.light (41, BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF);
+        padGrid.light (41, BeatstepColorManager.BEATSTEP_BUTTON_STATE_PINK);
         padGrid.light (42, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
         padGrid.light (43, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
     }

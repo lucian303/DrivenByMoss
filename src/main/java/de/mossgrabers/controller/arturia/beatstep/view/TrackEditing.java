@@ -6,8 +6,11 @@ package de.mossgrabers.controller.arturia.beatstep.view;
 
 import de.mossgrabers.controller.arturia.beatstep.controller.BeatstepControlSurface;
 import de.mossgrabers.framework.daw.IModel;
+import de.mossgrabers.framework.daw.data.ICursorDevice;
 import de.mossgrabers.framework.daw.data.ITrack;
 import de.mossgrabers.framework.daw.data.bank.ITrackBank;
+import de.mossgrabers.framework.featuregroup.AbstractView;
+import de.mossgrabers.framework.view.Views;
 
 import java.util.Optional;
 
@@ -17,7 +20,7 @@ import java.util.Optional;
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
-public class TrackEditing
+public class TrackEditing extends AbstractView
 {
     private BeatstepControlSurface surface;
     private IModel                 model;
@@ -31,6 +34,7 @@ public class TrackEditing
      */
     public TrackEditing (final BeatstepControlSurface surface, final IModel model)
     {
+        super("Track Editing", surface, model);
         this.surface = surface;
         this.model = model;
     }
@@ -53,34 +57,50 @@ public class TrackEditing
         switch (index)
         {
             case 0:
+                this.surface.getDisplay ().notify ("Volume " + (isTurnedRight ? "up" : "down"));
                 selectedTrack.get ().changeVolume (value);
                 break;
             case 1:
+                this.surface.getDisplay ().notify ("Pan " + (isTurnedRight ? "up" : "down"));
                 selectedTrack.get ().changePan (value);
                 break;
 
             case 2:
+                this.surface.getDisplay ().notify ((isTurnedRight ? "Mute" : "Unmute"));
                 selectedTrack.get ().setMute (isTurnedRight);
                 break;
 
             case 3:
+                this.surface.getDisplay ().notify ((isTurnedRight ? "Solo" : "Solo off"));
                 selectedTrack.get ().setSolo (isTurnedRight);
                 break;
 
             case 4:
-                selectedTrack.get ().getCrossfadeParameter ().changeValue (value);
+                this.surface.getDisplay ().notify ((isTurnedRight ? "Armed" : "Unarmed"));
+                selectedTrack.get ().setRecArm (isTurnedRight);
                 break;
 
             case 5:
+                this.surface.getDisplay ().notify ("Tempo " + (isTurnedRight ? "up" : "down"));
                 this.model.getTransport ().changeTempo (isTurnedRight, this.surface.isShiftPressed ());
                 break;
 
             case 6:
+                this.surface.getDisplay ().notify ("Move " + (isTurnedRight ? "right" : "left"));
                 this.model.getTransport ().changePosition (isTurnedRight, this.surface.isShiftPressed ());
                 break;
 
             case 7:
-                this.model.getMasterTrack ().changeVolume (value);
+                this.surface.getViewManager ().setActive (Views.DEVICE);
+                final ICursorDevice cd = this.model.getCursorDevice ();
+                if (this.model.hasSelectedDevice ()) {
+                    this.surface.getDisplay ().notify ("Replace device");
+                    this.model.getBrowser ().replace (cd);
+                }
+                else {
+                    this.surface.getDisplay ().notify ("Add device after");
+                    this.model.getBrowser ().insertAfterCursorDevice ();
+                }
                 break;
 
             // Send 1 - 4
@@ -88,13 +108,44 @@ public class TrackEditing
             case 9:
             case 10:
             case 11:
-                if (!this.model.isEffectTrackBankActive ())
+                if (!this.model.isEffectTrackBankActive ()) {
+                    this.surface.getDisplay ().notify ("Send: " + (index - 8) + (isTurnedRight ? " up" : " down"));
                     selectedTrack.get ().getSendBank ().getItem (index - 8).changeValue (value);
+                }
+                break;
+
+            // Big knob
+            case 16:
+                if (isTurnedRight) {
+                    int knobIndex2 = selectedTrack.get ().getIndex () + 1;
+                    if (knobIndex2 >= 8 || this.surface.isShiftPressed ()) {
+                        tb.selectNextPage ();
+                        this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Next Bank: " + this.getBank ()), 150);
+                    } else
+                        this.selectTrack (knobIndex2);
+                } else {
+                    int knobIndex = selectedTrack.get ().getIndex () - 1;
+                    if (knobIndex < 0 || this.surface.isShiftPressed ()) {
+                        tb.selectPreviousPage ();
+                        this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Previous Bank: " + this.getBank ()), 150);
+                    }
+                    else
+                        this.selectTrack (knobIndex);
+                }
+
                 break;
 
             default:
                 // Not used
                 break;
         }
+    }
+
+    @Override
+    public void drawGrid () {
+    }
+
+    @Override
+    public void onGridNote (int note, int velocity) {
     }
 }

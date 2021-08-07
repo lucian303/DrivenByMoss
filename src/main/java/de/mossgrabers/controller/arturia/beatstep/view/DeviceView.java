@@ -14,6 +14,7 @@ import de.mossgrabers.framework.daw.data.ILayer;
 import de.mossgrabers.framework.daw.data.bank.IChannelBank;
 import de.mossgrabers.framework.daw.data.bank.IParameterPageBank;
 import de.mossgrabers.framework.featuregroup.AbstractView;
+import de.mossgrabers.framework.view.Views;
 
 import java.util.Optional;
 
@@ -48,13 +49,14 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
     public void onKnob (final int index, final int value, final boolean isTurnedRight)
     {
         final ICursorDevice cd = this.model.getCursorDevice ();
-        if (index < 8)
+        if (index < 8 || index == 16)
         {
             this.extensions.onTrackKnob (index, value, isTurnedRight);
             return;
         }
 
         cd.getParameterBank ().getItem (index - 8).changeValue (value);
+        this.surface.getDisplay ().notify ("Param: " + cd.getParameterBank ().getItem (index - 8).getName () + " (" + (isTurnedRight ? "up" : "down") + ")");
     }
 
 
@@ -63,9 +65,6 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
     public void onGridNote (final int note, final int velocity)
     {
         if (velocity == 0)
-            return;
-
-        if (!this.model.hasSelectedDevice ())
             return;
 
         final ICursorDevice cd = this.model.getCursorDevice ();
@@ -94,6 +93,9 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
                 }
                 else
                     cd.selectPrevious ();
+
+                this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Previous Device: " + this.model.getCursorDevice ().getName ()), 150);
+
                 break;
 
             // Device Right
@@ -105,14 +107,24 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
                 }
                 else
                     cd.selectNext ();
+
+                this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Next Device: " + this.model.getCursorDevice ().getName ()), 150);
+
                 break;
 
             // Enter layer
             case 3:
-                if (!cd.hasLayers ())
+                // If no layer, show/hide the remote control param page
+                if (!cd.hasLayers ()) {
+                    this.surface.getDisplay ().notify ("Show Params");
+                    cd.toggleParameterPageSectionVisible ();
+
                     return;
+                }
+
                 if (this.isLayer)
                 {
+                    this.surface.getDisplay ().notify ("Into Layer");
                     if (sel.isPresent ())
                         sel.get ().enter ();
                 }
@@ -120,14 +132,24 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
                     bank.getItem (0).select ();
 
                 this.isLayer = !this.isLayer;
+                this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Device: " + this.model.getCursorDevice ().getName ()), 150);
+
                 break;
 
             // Exit layer
             case 4:
-                if (this.isLayer)
+                // Toggle external VST window if not in layer
+                if (!this.isLayer && !cd.isNested ()) {
+                    this.surface.getDisplay ().notify ("Device Details");
+                    cd.toggleWindowOpen ();
+
+                    return;
+                }
+
+                if (this.isLayer) {
+                    this.surface.getDisplay ().notify ("Out of Layer");
                     this.isLayer = false;
-                else
-                {
+                } else {
                     if (cd.isNested ())
                     {
                         cd.selectParent ();
@@ -136,24 +158,38 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
                     }
                 }
 
+                this.surface.scheduleTask (() -> this.surface.getDisplay ().notify ("Device: " + this.model.getCursorDevice ().getName ()), 150);
+
                 break;
 
+            // Open browser / create device
             case 5:
-                // Intentionally empty
+                if (this.model.hasSelectedDevice ()) {
+                    this.surface.getDisplay ().notify ("Replace Device");
+                    this.model.getBrowser ().replace (cd);
+                }
+                else {
+                    this.surface.getDisplay ().notify ("Add after");
+                    this.model.getBrowser ().insertAfterCursorDevice ();
+                }
                 break;
 
             // Param bank down
             case 6:
+                this.surface.getDisplay ().notify ("Previous Param Bank");
                 cd.getParameterBank ().scrollBackwards ();
                 break;
 
             // Param bank page up
             case 7:
+                this.surface.getDisplay ().notify ("Next Param Bank");
                 cd.getParameterBank ().scrollForwards ();
                 break;
 
             default:
-                cd.getParameterPageBank ().selectPage (note - 36 - 8);
+                final int paramBank = note - 36 - 8;
+                this.surface.getDisplay ().notify ("Param Bank: " + (paramBank + 1));
+                cd.getParameterPageBank ().selectPage (paramBank);
                 break;
         }
     }
@@ -174,7 +210,7 @@ public class DeviceView extends AbstractView<BeatstepControlSurface, BeatstepCon
         padGrid.light (38, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
         padGrid.light (39, BeatstepColorManager.BEATSTEP_BUTTON_STATE_RED);
         padGrid.light (40, BeatstepColorManager.BEATSTEP_BUTTON_STATE_RED);
-        padGrid.light (41, BeatstepColorManager.BEATSTEP_BUTTON_STATE_OFF);
+        padGrid.light (41, BeatstepColorManager.BEATSTEP_BUTTON_STATE_PINK);
         padGrid.light (42, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
         padGrid.light (43, BeatstepColorManager.BEATSTEP_BUTTON_STATE_BLUE);
     }
